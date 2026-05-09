@@ -5,70 +5,60 @@ import Sidebar from '../components/Sidebar';
 
 const LeafletMap = dynamic(() => import('../components/LeafletMap'), { 
   ssr: false,
-  loading: () => <div className="h-screen w-screen bg-black flex items-center justify-center text-white">正在开启时空地图...</div>
+  loading: () => <div className="h-screen w-screen bg-[#0a0a0a] flex items-center justify-center text-zinc-500 tracking-widest animate-pulse">正在唤醒旅行记忆...</div>
 });
 
 export default function Page() {
-  // mode 可以是 'entry' (入口), 'map' (看地图), 'list' (看足迹)
   const [mode, setMode] = useState<'entry' | 'map' | 'list'>('entry');
 
-  // 入口界面
   if (mode === 'entry') {
     return (
-      <main className="h-screen w-screen bg-black flex flex-col items-center justify-center text-white p-6 text-center">
-        <h1 className="text-4xl font-bold mb-2 tracking-widest">星屿的旅行志</h1>
-        <p className="text-zinc-500 mb-12 italic">“记录行走的每一个坐标”</p>
+      <main className="h-screen w-screen bg-[#0a0a0a] flex flex-col items-center justify-center text-white p-6 overflow-hidden relative">
+        {/* 背景装饰：一个暗色的圆晕 */}
+        <div className="absolute w-[500px] h-[500px] bg-indigo-900/20 rounded-full blur-[120px] -z-10" />
         
-        <div className="flex flex-col gap-4 w-full max-w-xs">
+        <div className="text-center animate-in fade-in zoom-in duration-1000">
+          <h1 className="text-5xl font-light mb-4 tracking-[0.2em] font-serif">星屿旅行志</h1>
+          <div className="h-[1px] w-12 bg-zinc-500 mx-auto mb-6" />
+          <p className="text-zinc-400 mb-16 tracking-[0.1em] text-sm uppercase">The Chronicle of Xingyu's Journey</p>
+        </div>
+        
+        <div className="flex flex-col gap-6 w-full max-w-[280px]">
           <button 
             onClick={() => setMode('map')}
-            className="border border-white py-4 px-8 hover:bg-white hover:text-black transition-all duration-500 tracking-widest"
+            className="group relative border border-zinc-700 py-4 px-8 overflow-hidden transition-all hover:border-white"
           >
-            开启地图模式
+            <span className="relative z-10 tracking-[0.3em] text-sm">探索地图</span>
+            <div className="absolute inset-0 bg-white translate-y-[101%] group-hover:translate-y-0 transition-transform duration-300" />
+            <style jsx>{`.group:hover span { color: black; }`}</style>
           </button>
           
           <button 
             onClick={() => setMode('list')}
-            className="border border-zinc-700 py-4 px-8 text-zinc-400 hover:border-white hover:text-white transition-all"
+            className="text-zinc-500 hover:text-white transition-colors tracking-[0.2em] text-xs uppercase"
           >
-            查看足迹列表
+            查看往昔足迹
           </button>
         </div>
         
-        <p className="absolute bottom-10 text-xs text-zinc-600">当前位置：山东</p>
+        <div className="absolute bottom-12 flex items-center gap-2 text-[10px] text-zinc-600 tracking-widest uppercase">
+          <span className="w-2 h-2 bg-indigo-500 rounded-full animate-ping" />
+          当前：山东 · 齐鲁大地
+        </div>
       </main>
     );
   }
 
-  // 足迹列表界面
-  if (mode === 'list') {
-    return (
-      <main className="h-screen w-screen bg-zinc-950 text-white p-8">
-        <button onClick={() => setMode('entry')} className="mb-8 text-zinc-500">← 返回</button>
-        <h2 className="text-2xl font-bold mb-6 text-indigo-400">足迹清单</h2>
-        <ul className="space-y-6">
-          <li className="border-l-2 border-zinc-800 pl-4">
-            <div className="text-lg font-bold">西安</div>
-            <p className="text-zinc-500 text-sm">起点 · 长安旧梦</p>
-          </li>
-          <li className="border-l-2 border-indigo-500 pl-4">
-            <div className="text-lg font-bold">山东</div>
-            <p className="text-zinc-500 text-sm">目前停留 · 齐鲁大地</p>
-          </li>
-        </ul>
-      </main>
-    );
-  }
-
-  // 地图模式
+  // 地图模式（保持之前的结构，但在左上角增加了精致的返回键）
   return (
     <main className="relative w-screen h-screen overflow-hidden bg-black">
-      <div className="absolute top-4 left-4 z-20">
+      <div className="absolute top-6 left-6 z-30">
         <button 
           onClick={() => setMode('entry')}
-          className="bg-black/50 backdrop-blur-md text-white px-4 py-2 border border-white/20 rounded-full text-sm"
+          className="group flex items-center gap-2 bg-black/40 backdrop-blur-xl text-white/70 px-5 py-2 border border-white/10 rounded-full text-xs tracking-tighter hover:text-white hover:border-white/40 transition-all"
         >
-          返回主菜单
+          <span>←</span>
+          <span className="opacity-0 group-hover:opacity-100 transition-opacity">返回主轴</span>
         </button>
       </div>
       
