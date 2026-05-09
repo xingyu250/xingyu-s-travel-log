@@ -1,19 +1,18 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 
-// 动态加载地图，防止 Next.js 服务端渲染报错，同时自带一个高级的加载画面
+// 动态加载地图：增加更多的安全保护
 const MapComponent = dynamic(() => import('../components/LeafletMap'), { 
   ssr: false,
   loading: () => (
-    <div className="h-screen w-screen bg-[#0a0a0a] flex flex-col items-center justify-center text-white relative">
-      <div className="w-12 h-12 border-t-2 border-indigo-500 border-solid rounded-full animate-spin mb-4"></div>
-      <p className="tracking-[0.3em] text-sm text-zinc-400">正在重构时空坐标...</p>
+    <div className="h-screen w-screen bg-[#050505] flex flex-col items-center justify-center text-white">
+      <div className="w-8 h-8 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin mb-4"></div>
+      <p className="tracking-widest text-xs text-zinc-500">正在同步地理坐标...</p>
     </div>
   )
 });
 
-// 核心旅行数据：你想增加新地点，只需要在这里加一行
 const TRAVEL_DATA = [
   {
     id: 'xian',
@@ -36,71 +35,70 @@ const TRAVEL_DATA = [
 export default function VoyageLogPage() {
   const [hasEntered, setHasEntered] = useState(false);
   const [activeLocation, setActiveLocation] = useState<any>(null);
+  const [isMounted, setIsMounted] = useState(false);
 
-  // 1. 高级入口页面
+  // 关键修复：确保组件在客户端完全挂载后再显示内容，防止 Client-side Exception
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) return <div className="h-screen w-screen bg-black" />;
+
+  // 1. 入口页面
   if (!hasEntered) {
     return (
       <main className="h-screen w-screen bg-[#050505] flex flex-col items-center justify-center text-white relative overflow-hidden">
-        {/* 背景氛围光 */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60vw] h-[60vw] bg-indigo-900/20 rounded-full blur-[100px] pointer-events-none" />
-        
-        <div className="z-10 text-center flex flex-col items-center">
-          <h1 className="text-4xl md:text-6xl font-light mb-6 tracking-[0.25em] font-serif">星屿的旅行志</h1>
-          <div className="w-10 h-[1px] bg-white/30 mb-8" />
-          <p className="text-zinc-400 mb-16 tracking-[0.15em] text-sm md:text-base font-light">"世界是一本书，而我正在翻阅它。"</p>
-          
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60vw] h-[60vw] bg-indigo-900/10 rounded-full blur-[100px] pointer-events-none" />
+        <div className="z-10 text-center flex flex-col items-center px-6">
+          <h1 className="text-4xl md:text-6xl font-light mb-6 tracking-[0.2em] font-serif">星屿的旅行志</h1>
+          <div className="w-10 h-[px] bg-white/20 mb-8" />
+          <p className="text-zinc-500 mb-12 tracking-[0.1em] text-sm font-light">"世界是一本书，而我正在翻阅它。"</p>
           <button 
             onClick={() => setHasEntered(true)}
-            className="group relative px-8 py-4 border border-white/20 hover:border-white/80 transition-all duration-700 bg-black/50 backdrop-blur-sm overflow-hidden"
+            className="group relative px-10 py-4 border border-white/10 hover:border-white/50 transition-all duration-700 bg-white/5 text-white overflow-hidden"
           >
-            <span className="relative z-10 tracking-[0.3em] text-sm group-hover:text-black transition-colors duration-500">开启探索</span>
-            <div className="absolute inset-0 bg-white translate-y-[101%] group-hover:translate-y-0 transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]" />
+            <span className="relative z-10 tracking-[0.4em] text-xs uppercase group-hover:text-black transition-colors duration-500">开启探索</span>
+            <div className="absolute inset-0 bg-white translate-y-[101%] group-hover:translate-y-0 transition-transform duration-500" />
           </button>
         </div>
       </main>
     );
   }
 
-  // 2. 地图 & 交互侧边栏页面
+  // 2. 地图 & 侧边栏
   return (
-    <main className="relative w-screen h-screen overflow-hidden bg-black flex">
-      
-      {/* 左侧：磨砂玻璃质感的侧边栏 (PC端占300px，移动端占底部或浮动) */}
-      <div className="absolute left-0 top-0 h-full w-[320px] bg-black/60 backdrop-blur-2xl border-r border-white/10 z-20 flex flex-col transform transition-transform duration-500 text-white shadow-2xl">
-        
-        {/* 侧边栏头部 */}
-        <div className="p-8 border-b border-white/10">
-          <button onClick={() => setHasEntered(false)} className="text-xs text-zinc-500 hover:text-white transition-colors mb-4 tracking-widest">
-            ← 返回封面
+    <main className="relative w-screen h-screen overflow-hidden bg-black flex flex-col md:flex-row">
+      {/* 侧边栏：手机端改为顶部浮动，更丝滑 */}
+      <div className="absolute left-0 top-0 h-full w-full md:w-[320px] bg-black/60 backdrop-blur-2xl border-r border-white/10 z-20 flex flex-col pointer-events-none">
+        <div className="p-8 border-b border-white/5 pointer-events-auto">
+          <button onClick={() => setHasEntered(false)} className="text-[10px] text-zinc-500 hover:text-white transition-colors tracking-widest uppercase">
+            ← Back to Cover
           </button>
-          <h2 className="text-2xl font-serif tracking-widest mt-2">我的足迹</h2>
+          <h2 className="text-xl font-serif tracking-[0.2em] mt-4 text-white">我的足迹</h2>
         </div>
 
-        {/* 侧边栏列表：点击地点，地图自动飞行 */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto p-6 space-y-4 pointer-events-auto">
           {TRAVEL_DATA.map((loc) => (
             <div 
               key={loc.id}
               onClick={() => setActiveLocation(loc)}
-              className={`p-4 rounded-xl cursor-pointer transition-all duration-300 border ${
+              className={`p-4 rounded-lg cursor-pointer transition-all duration-300 border ${
                 activeLocation?.id === loc.id 
-                  ? 'bg-white/10 border-indigo-500/50 shadow-[0_0_20px_rgba(99,102,241,0.1)]' 
+                  ? 'bg-white/10 border-indigo-500/50' 
                   : 'bg-transparent border-white/5 hover:bg-white/5'
               }`}
             >
-              <h3 className="text-lg font-bold tracking-wider">{loc.name}</h3>
-              <p className="text-xs text-indigo-400 mt-1">{loc.date}</p>
-              <p className="text-sm text-zinc-400 mt-3 line-clamp-2">{loc.note}</p>
+              <h3 className="text-base font-bold tracking-wider text-white">{loc.name}</h3>
+              <p className="text-[10px] text-indigo-400 mt-1 uppercase">{loc.date}</p>
             </div>
           ))}
         </div>
       </div>
 
-      {/* 右侧/底层：全屏地图 */}
+      {/* 全屏地图 */}
       <div className="absolute inset-0 z-0">
         <MapComponent locations={TRAVEL_DATA} activeLocation={activeLocation} />
       </div>
-
     </main>
   );
 }
