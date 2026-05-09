@@ -2,10 +2,10 @@
 
 import dynamic from 'next/dynamic';
 import { useState, useEffect } from 'react';
-import Sidebar from '@/components/Sidebar';
+import Sidebar from '../components/Sidebar';
 
-// 这里的 '@/components/...' 是万能路径，不管文件在哪都能找对
-const LeafletMap = dynamic(() => import('@/components/LeafletMap'), {
+// 使用 ../ 这种路径在你的层级结构下最保险
+const LeafletMap = dynamic(() => import('../components/LeafletMap'), {
   ssr: false,
   loading: () => (
     <div className="w-full h-full bg-zinc-950 flex items-center justify-center text-white">
@@ -26,7 +26,7 @@ export default function VoyageLogPage() {
   return (
     <main className="relative w-full h-screen bg-black flex overflow-hidden">
       {/* 侧边栏 */}
-      <Sidebar nodes={nodes} />
+      <Sidebar />
       
       {/* 地图区域 */}
       <div className="flex-1 h-full relative">
