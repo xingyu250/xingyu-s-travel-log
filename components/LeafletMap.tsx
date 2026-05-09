@@ -1,41 +1,33 @@
 "use client";
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
-// 修复图标问题
-const icon = L.icon({
-  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+// 解决 Leaflet 在 Next.js 中图标不显示的经典 Bug
+const DefaultIcon = L.icon({
+  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
   iconSize: [25, 41],
   iconAnchor: [12, 41],
 });
+L.Marker.prototype.options.icon = DefaultIcon;
 
-const LeafletMap = () => {
+export default function LeafletMap() {
   return (
-    // 关键点：强制设定高度为 100vh (视口高度)
-    <div style={{ height: '100vh', width: '100%', position: 'relative', backgroundColor: '#111' }}>
+    <div style={{ height: '100vh', width: '100%', position: 'absolute', top: 0, left: 0, zIndex: 0 }}>
       <MapContainer 
         center={[34.3416, 108.9398]} 
         zoom={5} 
         style={{ height: '100%', width: '100%' }}
-        scrollWheelZoom={true}
+        zoomControl={false} // 手机端建议关闭，防止遮挡
       >
         <TileLayer
-          attribution='&copy; OpenStreetMap contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" // 换成酷炫的深色地图，更符合你的风格
+          attribution='&copy; OpenStreetMap'
         />
-        <Marker position={[34.3416, 108.9398]} icon={icon}>
-          <Popup>
-            <div style={{ color: '#333' }}>
-              <h3 className="font-bold">西安</h3>
-              <p>我的旅行起点。</p>
-            </div>
-          </Popup>
+        <Marker position={[34.3416, 108.9398]}>
+          <Popup>西安：旅行起点</Popup>
         </Marker>
       </MapContainer>
     </div>
   );
-};
-
-export default LeafletMap;
+}
