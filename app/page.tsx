@@ -1,35 +1,28 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { useState, useEffect } from 'react';
 import Sidebar from '../components/Sidebar';
 
-// 使用 ../ 这种路径在你的层级结构下最保险
+// 强制让 Loading 状态也占满空间，防止跳动
 const LeafletMap = dynamic(() => import('../components/LeafletMap'), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-full bg-zinc-950 flex items-center justify-center text-white">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
-      <p className="ml-3">地图加载中...</p>
+    <div className="w-full h-full bg-zinc-900 flex items-center justify-center text-white">
+      <p>地图正在赶来的路上...</p>
     </div>
   )
 });
 
 export default function VoyageLogPage() {
-  const [nodes, setNodes] = useState([]);
-
-  useEffect(() => {
-    const saved = localStorage.getItem('travel_log_nodes');
-    if (saved) setNodes(JSON.parse(saved));
-  }, []);
-
   return (
-    <main className="relative w-full h-screen bg-black flex overflow-hidden">
-      {/* 侧边栏 */}
-      <Sidebar />
+    <main className="flex h-screen w-screen bg-black overflow-hidden">
+      {/* 侧边栏：固定宽度 */}
+      <div className="flex-none h-full">
+        <Sidebar />
+      </div>
       
-      {/* 地图区域 */}
-      <div className="flex-1 h-full relative">
+      {/* 地图区域：强制占满剩余所有空间 */}
+      <div className="flex-grow h-full w-full relative">
         <LeafletMap />
       </div>
     </main>
