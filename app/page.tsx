@@ -2,37 +2,36 @@
 
 import dynamic from 'next/dynamic';
 import { useState, useEffect } from 'react';
-import Sidebar from '../components/Sidebar';
+import Sidebar from '@/components/Sidebar';
 
-const LeafletMap = dynamic(() => import('../components/LeafletMap'), {
+// 这里的 '@/components/...' 是万能路径，不管文件在哪都能找对
+const LeafletMap = dynamic(() => import('@/components/LeafletMap'), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-full bg-zinc-950 flex items-center justify-center">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-amber-500"></div>
+    <div className="w-full h-full bg-zinc-950 flex items-center justify-center text-white">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
+      <p className="ml-3">地图加载中...</p>
     </div>
   )
 });
 
 export default function VoyageLogPage() {
-  const [nodes, setNodes] = useState<any[]>([]);
+  const [nodes, setNodes] = useState([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem('travel_logs');
+    const saved = localStorage.getItem('travel_log_nodes');
     if (saved) setNodes(JSON.parse(saved));
-
-    const handleStorageChange = () => {
-      const updated = localStorage.getItem('travel_logs');
-      if (updated) setNodes(JSON.parse(updated));
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
   return (
-    <main className="relative w-full h-screen bg-black overflow-hidden">
-      <LeafletMap />
+    <main className="relative w-full h-screen bg-black flex overflow-hidden">
+      {/* 侧边栏 */}
       <Sidebar nodes={nodes} />
+      
+      {/* 地图区域 */}
+      <div className="flex-1 h-full relative">
+        <LeafletMap />
+      </div>
     </main>
   );
 }
